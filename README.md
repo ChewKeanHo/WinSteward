@@ -43,6 +43,16 @@ This library is heavily guarded with unit tests whenever available.
 
 
 
+## Source & References
+
+This product is referenced from:
+
+1. AutomataCI - https://github.com/ChewKeanHo/AutomataCI
+2. Win11 Debloat - https://github.com/Raphire/Win11Debloat
+
+
+
+
 ## License
 
 This project is licensed under [Chew Kean Ho's WinSteward License Agreement](LICENSE.pdf).

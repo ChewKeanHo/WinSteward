@@ -13,7 +13,7 @@
 
 
 
-# configure charset encoding
+# configure charset encoding - DO NOT EDIT!
 $PSDefaultParameterValues['*:Encoding'] = 'utf8'
 $OutputEncoding = [console]::InputEncoding `
                 = [console]::OutputEncoding `
@@ -22,7 +22,44 @@ $OutputEncoding = [console]::InputEncoding `
 
 
 
-# prepare seal function
+# START EDITING AFTER THIS LINE
+function Setup-Org-Settings {
+        # NOTICE: customize your organizational custom functions here upon first
+        #         boot after flashing the image. The only requirement and
+        #         condition is to keep all your execution quiet ($null = ...)
+        #         and only return '0' for successful or '1' (non-zero) for
+        #         error.
+
+
+        # report status
+        return 0
+}
+# STOP EDITING BEYOND THIS LINE
+
+
+
+
+function Setup-OS {
+        # TODO: added Windows 10/11 bloatware disabling executions here
+        #       referencing https://github.com/Raphire/Win11Debloat
+
+        # execute organizational settings
+        try {
+                $___ret = Setup-Org-Settings
+                if ($___ret -ne 0) {
+                        return 1
+                }
+        } catch {
+                return 1
+        }
+
+        # report status
+        return 0
+}
+
+
+
+
 function Seal-OS {
         # get sysprep command
         $___program = Get-Command sysprep -ErrorAction SilentlyContinue
@@ -32,21 +69,16 @@ function Seal-OS {
 
 
         # execute
-        $___process = Start-Process -Wait -FilePath $___program -NoNewWindow -PassThru
+        $___process = Start-Process -Wait `
+                        -FilePath $___program `
+                        -NoNewWindow `
+                        -PassThru `
+                        -ArgumentsList "/generalize /oobe /shutdown /resetlimit"
         if ($___process.ExitCode -ne 0) {
                 return 1
         }
 
 
-        # report status
-        return 0
-}
-
-
-
-
-# prepare setup function
-function Setup-OS {
         # report status
         return 0
 }
@@ -61,5 +93,6 @@ switch ($args[0]) {
 } { $_ -in 'setup', 'Setup', 'SETUP' } {
         return Setup-OS
 } default {
+        Write-Host "$ Powershell.exe -NoProfile -executionpolicy bypass -Command `"& './winsteward.ps1`""
         return 1
 }}
