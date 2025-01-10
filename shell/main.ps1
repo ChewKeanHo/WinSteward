@@ -61,19 +61,40 @@ function Setup-OS {
 
 
 function Seal-OS {
+        # remove conflicing dependencies
+        foreach ($___app in @(
+                "Microsoft.OneDriveSync",
+                "Microsoft.Windows.Client.WebExperience",
+                "Microsoft.WidgetsPlatformRuntime"
+        )) {
+                try {
+                        $___app = Get-AppxPackage $___app `
+                                        -ErrorAction SilentlyContinue
+
+                        if ($___app) {
+                                $null = Remove-AppxPackage $___app `
+                                                -ErrorAction SilentlyContinue
+                        }
+                } catch {
+                        # continue
+                }
+        }
+
+
         # get sysprep command
-        $___program = Get-Command sysprep -ErrorAction SilentlyContinue
-        if (-not ($___program)) {
+        $___program = Get-Command "C:\Windows\system32\Sysprep\sysprep.exe" `
+                                -ErrorAction SilentlyContinue
+        if (-not $___program) {
                 return 1
         }
 
 
         # execute
         $___process = Start-Process -Wait `
-                        -FilePath $___program `
+                        -FilePath $___program.Path `
                         -NoNewWindow `
                         -PassThru `
-                        -ArgumentsList "/generalize /oobe /shutdown /resetlimit"
+                        -ArgumentList "/generalize /oobe /shutdown /resetlimit"
         if ($___process.ExitCode -ne 0) {
                 return 1
         }
